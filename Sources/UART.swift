@@ -57,6 +57,7 @@ public protocol UARTInterface {
     func readString() -> String
     func readLine() -> String
     func readData() -> [CChar]
+    func readBytes(size s : UInt32) -> [UInt8]
     func writeString(_ value: String)
     func writeData(_ values: [CChar])
     func writeBytes(_ values: [UInt8])
@@ -238,6 +239,17 @@ public final class SysFSUART: UARTInterface {
         var buf = [CChar](repeating:0, count: 4096) //4096 chars at max in canonical mode
 
         let n = read(fd, &buf, buf.count * MemoryLayout<CChar>.stride)
+        if n<0 {
+            perror("Error while reading from UART")
+            abort()
+        }
+        return Array(buf[0..<n])
+    }
+
+     public func readBytes(size s : UInt32 = 100) -> [UInt8] {
+        var buf = [UInt8](repeating:0, count: Int(s)) //4096 chars at max in canonical mode
+
+        let n = read(fd, &buf, buf.count * MemoryLayout<UInt8>.stride)
         if n<0 {
             perror("Error while reading from UART")
             abort()
