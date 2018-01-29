@@ -59,6 +59,7 @@ public protocol UARTInterface {
     func readData() -> [CChar]
     func writeString(_ value: String)
     func writeData(_ values: [CChar])
+    func writeData(_ values: [UInt8])
 }
 
 public enum ParityType {
@@ -256,6 +257,14 @@ public final class SysFSUART: UARTInterface {
         _ = write(fd, &value, value.count)
         tcdrain(fd)
     }
+
+    public func writeData(_ value: [UInt8]) {
+        var value = value
+
+        _ = write(fd, &value, value.count)
+        tcdrain(fd)
+    }
+
 
     private func applyConfiguration() {
         if tcsetattr (fd, TCSANOW, &tty) != 0 {
